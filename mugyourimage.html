@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MugYourImage - 个性化马克杯设计</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+    
+    :root {
+      --navy: #24436d;
+      --pink: #f094a0;
+      --white: #ffffff;
+      --gray-light: #f5f5f5;
+      --gray-medium: #e0e0e0;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--navy);
+      color: var(--white);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    header {
+      background-color: var(--navy);
+      width: 100%;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    h1 {
+      color: var(--pink);
+      font-size: 2.5rem;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .upload-section {
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 2rem;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .file-upload {
+      margin: 1rem 0;
+      padding: 1rem;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 2px dashed var(--pink);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    
+    .file-upload:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: var(--pink);
+    }
+    
+    .file-upload input[type="file"] {
+      display: none;
+    }
+    
+    .file-upload label {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .file-upload svg {
+      width: 40px;
+      height: 40px;
+      fill: var(--pink);
+    }
+    
+    .preview-section {
+      width: 100%;
+      max-width: 800px;
+      position: relative;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    #canvas {
+      width: 100%;
+      max-height: 500px;
+      border-radius: 8px;
+      border: 3px solid var(--pink);
+      cursor: move;
+    }
+    
+    .controls {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+    
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+    }
+    
+    .control-group label {
+      font-size: 0.9rem;
+      color: var(--pink);
+    }
+    
+    input[type="range"] {
+      width: 120px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--pink);
+      height: 4px;
+      border-radius: 4px;
+      outline: none;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--white);
+      cursor: pointer;
+    }
+    
+    button {
+      background-color: var(--pink);
+      color: var(--white);
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    button:hover {
+      background-color: #de7e8a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .action-buttons {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+    
+    .instructions {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: var(--pink);
+      font-size: 1.1rem;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      .upload-section, .preview-section {
+        padding: 1rem;
+      }
+      
+      .controls {
+        flex-direction: column;
+      }
+      
+      .control-group {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MugYourImage</h1>
+  </header>
+  
+  <div class="container">
+    <div class="instructions">
+      Design your custom mug in just a few steps: upload a mug image and your decal, adjust position and effects, and preview the final result!
+    </div>
+    
+    <div class="upload-section">
+      <div class="file-upload">
+        <label for="mugInput">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+          </svg>
+          Upload Mug Image
+          <input type="file" id="mugInput" accept="image/*">
+        </label>
+      </div>
+      
+      <div class="file-upload">
+        <label for="decalInput">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/>
+          </svg>
+          Upload Your Decal
+          <input type="file" id="decalInput" accept="image/*">
+        </label>
+      </div>
+    </div>
+    
+    <div class="preview-section">
+      <canvas id="canvas" width="800" height="600"></canvas>
+      
+      <div class="controls">
+        <div class="control-group">
+          <label>Horizontal:</label>
+          <input type="range" id="xPosition" min="-200" max="200" value="0">
+        </div>
+        
+        <div class="control-group">
+          <label>Vertical:</label>
+          <input type="range" id="yPosition" min="-200" max="200" value="0">
+        </div>
+        
+        <div class="control-group">
+          <label>Size:</label>
+          <input type="range" id="decalScale" min="10" max="200" value="100">
+        </div>
+        
+        <div class="control-group">
+          <label>Rotation:</label>
+          <input type="range" id="decalRotation" min="-180" max="180" value="0">
+        </div>
+      </div>
+      
+      <div class="action-buttons">
+        <button onclick="generateDesign()">Apply Effects</button>
+        <button onclick="downloadImage()">Download JPG</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    let mugImage = new Image();
+    let decalImage = new Image();
+    let currentSettings = {
+      x: 0,
+      y: 0,
+      scale: 1,
+      rotation: 0
+    };
+    let isDragging = false;
+    let lastMouseX, lastMouseY;
+    
+    // File upload handlers
+    document.getElementById('mugInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        mugImage.src = URL.createObjectURL(file);
+        mugImage.onload = () => {
+          drawImages();
+        };
+      }
+    });
+    
+    document.getElementById('decalInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        decalImage.src = URL.createObjectURL(file);
+        decalImage.onload = () => {
+          drawImages();
+        };
+      }
+    });
+    
+    // Range control handlers
+    document.getElementById('xPosition').addEventListener('input', function(e) {
+      currentSettings.x = parseInt(e.target.value);
+      drawImages();
+    });
+    
+    document.getElementById('yPosition').addEventListener('input', function(e) {
+      currentSettings.y = parseInt(e.target.value);
+      drawImages();
+    });
+    
+    document.getElementById('decalScale').addEventListener('input', function(e) {
+      currentSettings.scale = parseInt(e.target.value) / 100;
+      drawImages();
+    });
+    
+    document.getElementById('decalRotation').addEventListener('input', function(e) {
+      currentSettings.rotation = parseInt(e.target.value) * Math.PI / 180;
+      drawImages();
+    });
+    
+    // Mouse drag handlers for canvas
+    const canvas = document.getElementById('canvas');
+    
+    canvas.addEventListener('mousedown', function(e) {
+      if (decalImage.complete && decalImage.src && mugImage.complete && mugImage.src) {
+        isDragging = true;
+        const rect = canvas.getBoundingClientRect();
+        lastMouseX = e.clientX - rect.left;
+        lastMouseY = e.clientY - rect.top;
+      }
+    });
+    
+    canvas.addEventListener('mousemove', function(e) {
+      if (isDragging) {
+        const rect = canvas.getBoundingClientRect();
+        const currentX = e.clientX - rect.left;
+        const currentY = e.clientY - rect.top;
+        
+        const deltaX = currentX - lastMouseX;
+        const deltaY = currentY - lastMouseY;
+        
+        currentSettings.x += deltaX;
+        currentSettings.y += deltaY;
+        
+        // Update sliders to reflect new position
+        document.getElementById('xPosition').value = currentSettings.x;
+        document.getElementById('yPosition').value = currentSettings.y;
+        
+        lastMouseX = currentX;
+        lastMouseY = currentY;
+        
+        drawImages();
+      }
+    });
+    
+    canvas.addEventListener('mouseup', function() {
+      isDragging = false;
+    });
+    
+    canvas.addEventListener('mouseleave', function() {
+      isDragging = false;
+    });
+    
+    function drawImages() {
+      const ctx = canvas.getContext('2d');
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw mug image if loaded
+      if (mugImage.complete && mugImage.src) {
+        ctx.drawImage(mugImage, 0, 0, canvas.width, canvas.height);
+      }
+      
+      // Draw decal with transformations if loaded
+      if (decalImage.complete && decalImage.src) {
+        ctx.save();
+        
+        // Calculate center position for decal
+        const centerX = canvas.width / 2 + currentSettings.x;
+        const centerY = canvas.height / 2 + currentSettings.y;
+        
+        // Apply transformations
+        ctx.translate(centerX, centerY);
+        ctx.rotate(currentSettings.rotation);
+        ctx.scale(currentSettings.scale, currentSettings.scale);
+        
+        // Use multiply blend mode
+        ctx.globalCompositeOperation = 'multiply';
+        
+        // Draw decal centered
+        const drawWidth = decalImage.width;
+        const drawHeight = decalImage.height;
+        ctx.drawImage(decalImage, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+        
+        // Restore context
+        ctx.restore();
+        ctx.globalCompositeOperation = 'source-over';
+      }
+    }
+    
+    function generateDesign() {
+      drawImages();
+      alert('Design applied successfully!');
+    }
+    
+    function downloadImage() {
+      const canvas = document.getElementById('canvas');
+      const link = document.createElement('a');
+      link.download = 'my-custom-mug.jpg';
+      
+      // Create a temporary canvas with white background
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = canvas.height;
+      const tempCtx = tempCanvas.getContext('2d');
+      
+      // Fill white background
+      tempCtx.fillStyle = '#FFFFFF';
+      tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      
+      // Draw the original canvas onto the temporary canvas
+      tempCtx.drawImage(canvas, 0, 0);
+      
+      // Convert to JPEG with quality
+      link.href = tempCanvas.toDataURL('image/jpeg', 0.9);
+      link.click();
+    }
+  </script>
+</body>
+</html>
