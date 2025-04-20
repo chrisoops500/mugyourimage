@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MugYourImage - 个性化马克杯设计</title>
+  <title>MugYourImage - Custom Mug Designer</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
     
@@ -62,6 +62,22 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     
+    .default-option {
+      margin: 1rem 0;
+      width: 100%;
+      padding: 0.8rem;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 2px solid var(--pink);
+      color: var(--pink);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .default-option:hover {
+      background-color: var(--pink);
+      color: var(--white);
+    }
+    
     .file-upload {
       margin: 1rem 0;
       padding: 1rem;
@@ -106,12 +122,24 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     
-    #canvas {
+    .canvas-container {
       width: 100%;
-      max-height: 500px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 1rem;
+      position: relative;
+      overflow: hidden;
       border-radius: 8px;
       border: 3px solid var(--pink);
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    #canvas {
+      max-width: 100%;
+      max-height: 600px;
       cursor: move;
+      display: block;
     }
     
     .controls {
@@ -154,6 +182,28 @@
       border-radius: 50%;
       background: var(--white);
       cursor: pointer;
+    }
+    
+    .checkbox-control {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+    }
+    
+    .checkbox-control label {
+      font-size: 0.9rem;
+      color: var(--pink);
+      cursor: pointer;
+    }
+    
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--pink);
     }
     
     button {
@@ -214,7 +264,7 @@
   
   <div class="container">
     <div class="instructions">
-      Design your custom mug in just a few steps: upload a mug image and your decal, adjust position and effects, and preview the final result!
+      Design your custom mug: Upload a mug image and your design, adjust position and effects, preview the final result!
     </div>
     
     <div class="upload-section">
@@ -228,28 +278,32 @@
         </label>
       </div>
       
+      <button class="default-option" onclick="useDefaultMug()">Use Default Cartoon Mug</button>
+      
       <div class="file-upload">
         <label for="decalInput">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/>
           </svg>
-          Upload Your Decal
+          Upload Your Design
           <input type="file" id="decalInput" accept="image/*">
         </label>
       </div>
     </div>
     
     <div class="preview-section">
-      <canvas id="canvas" width="800" height="600"></canvas>
+      <div class="canvas-container">
+        <canvas id="canvas"></canvas>
+      </div>
       
       <div class="controls">
         <div class="control-group">
-          <label>Horizontal:</label>
+          <label>Horizontal Position:</label>
           <input type="range" id="xPosition" min="-200" max="200" value="0">
         </div>
         
         <div class="control-group">
-          <label>Vertical:</label>
+          <label>Vertical Position:</label>
           <input type="range" id="yPosition" min="-200" max="200" value="0">
         </div>
         
@@ -262,13 +316,31 @@
           <label>Rotation:</label>
           <input type="range" id="decalRotation" min="-180" max="180" value="0">
         </div>
+        
+        <div class="checkbox-control">
+          <input type="checkbox" id="useMultiplyMode" checked>
+          <label for="useMultiplyMode">Use Multiply Mode (Sometimes Amazing Effect)</label>
+        </div>
       </div>
       
       <div class="action-buttons">
-        <button onclick="generateDesign()">Apply Effects</button>
-        <button onclick="downloadImage()">Download JPG</button>
+        <button onclick="downloadImage()">Download Design (JPG)</button>
       </div>
     </div>
+  </div>
+
+  <!-- Hidden container to store our default cartoon mug SVG -->
+  <div id="defaultMugContainer" style="display:none;">
+    <svg id="defaultMugSVG" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="800" height="600">
+      <!-- White mug body -->
+      <path d="M100,60 L100,240 Q100,260 120,260 L240,260 Q260,260 260,240 L260,60 Z" fill="#ffffff" stroke="#cccccc" stroke-width="3"/>
+      <!-- Mug handle -->
+      <path d="M260,100 Q300,100 300,150 Q300,200 260,200" fill="none" stroke="#cccccc" stroke-width="10" stroke-linecap="round"/>
+      <!-- Mug rim -->
+      <ellipse cx="180" cy="60" rx="80" ry="20" fill="#ffffff" stroke="#cccccc" stroke-width="3"/>
+      <!-- Inner circle shadow -->
+      <ellipse cx="180" cy="60" rx="70" ry="10" fill="#f5f5f5" stroke="#eeeeee" stroke-width="1"/>
+    </svg>
   </div>
   
   <script>
@@ -278,33 +350,103 @@
       x: 0,
       y: 0,
       scale: 1,
-      rotation: 0
+      rotation: 0,
+      useMultiplyMode: true
     };
     let isDragging = false;
     let lastMouseX, lastMouseY;
     
-    // File upload handlers
+    // Load default mug on page load
+    window.onload = function() {
+      useDefaultMug();
+      document.getElementById('useMultiplyMode').addEventListener('change', function(e) {
+        currentSettings.useMultiplyMode = e.target.checked;
+        drawImages();
+      });
+    };
+    
+    function useDefaultMug() {
+      // Convert our SVG to a data URL
+      const svgElement = document.getElementById('defaultMugSVG');
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+      const url = URL.createObjectURL(svgBlob);
+      
+      // Create a new image using our SVG data URL
+      mugImage = new Image();
+      mugImage.onload = () => {
+        setupCanvas();
+        drawImages();
+        // Clean up the object URL
+        URL.revokeObjectURL(url);
+      };
+      
+      // Set the source of our image to the SVG data URL
+      mugImage.src = url;
+    }
+    
+    function setupCanvas() {
+      const canvas = document.getElementById('canvas');
+      const container = document.querySelector('.canvas-container');
+      
+      // Default dimensions if no image is loaded
+      let canvasWidth = 800;
+      let canvasHeight = 600;
+      
+      if (mugImage.complete && mugImage.src) {
+        // Use actual dimensions of the image
+        canvasWidth = mugImage.width;
+        canvasHeight = mugImage.height;
+      }
+      
+      // Set canvas dimensions
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+      
+      // Adjust container style to ensure the canvas fits the screen but maintains aspect ratio
+      container.style.maxWidth = '100%';
+      container.style.height = 'auto';
+      
+      // Reset position settings
+      currentSettings.x = 0;
+      currentSettings.y = 0;
+      document.getElementById('xPosition').value = 0;
+      document.getElementById('yPosition').value = 0;
+    }
+    
+    // File upload handling
     document.getElementById('mugInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
-        mugImage.src = URL.createObjectURL(file);
-        mugImage.onload = () => {
-          drawImages();
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          mugImage = new Image();
+          mugImage.onload = function() {
+            setupCanvas();
+            drawImages();
+          };
+          mugImage.src = event.target.result;
         };
+        reader.readAsDataURL(file);
       }
     });
     
     document.getElementById('decalInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
-        decalImage.src = URL.createObjectURL(file);
-        decalImage.onload = () => {
-          drawImages();
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          decalImage = new Image();
+          decalImage.onload = function() {
+            drawImages();
+          };
+          decalImage.src = event.target.result;
         };
+        reader.readAsDataURL(file);
       }
     });
     
-    // Range control handlers
+    // Range control handling
     document.getElementById('xPosition').addEventListener('input', function(e) {
       currentSettings.x = parseInt(e.target.value);
       drawImages();
@@ -325,7 +467,7 @@
       drawImages();
     });
     
-    // Mouse drag handlers for canvas
+    // Mouse drag handling
     const canvas = document.getElementById('canvas');
     
     canvas.addEventListener('mousedown', function(e) {
@@ -346,8 +488,12 @@
         const deltaX = currentX - lastMouseX;
         const deltaY = currentY - lastMouseY;
         
-        currentSettings.x += deltaX;
-        currentSettings.y += deltaY;
+        // Adjust drag movement based on the ratio of canvas actual size to display size
+        const scaleFactorX = canvas.width / rect.width;
+        const scaleFactorY = canvas.height / rect.height;
+        
+        currentSettings.x += deltaX * scaleFactorX;
+        currentSettings.y += deltaY * scaleFactorY;
         
         // Update sliders to reflect new position
         document.getElementById('xPosition').value = currentSettings.x;
@@ -368,22 +514,65 @@
       isDragging = false;
     });
     
+    // Touch screen support
+    canvas.addEventListener('touchstart', function(e) {
+      if (decalImage.complete && decalImage.src && mugImage.complete && mugImage.src) {
+        isDragging = true;
+        const rect = canvas.getBoundingClientRect();
+        lastMouseX = e.touches[0].clientX - rect.left;
+        lastMouseY = e.touches[0].clientY - rect.top;
+        e.preventDefault();
+      }
+    });
+    
+    canvas.addEventListener('touchmove', function(e) {
+      if (isDragging) {
+        const rect = canvas.getBoundingClientRect();
+        const currentX = e.touches[0].clientX - rect.left;
+        const currentY = e.touches[0].clientY - rect.top;
+        
+        const deltaX = currentX - lastMouseX;
+        const deltaY = currentY - lastMouseY;
+        
+        const scaleFactorX = canvas.width / rect.width;
+        const scaleFactorY = canvas.height / rect.height;
+        
+        currentSettings.x += deltaX * scaleFactorX;
+        currentSettings.y += deltaY * scaleFactorY;
+        
+        document.getElementById('xPosition').value = currentSettings.x;
+        document.getElementById('yPosition').value = currentSettings.y;
+        
+        lastMouseX = currentX;
+        lastMouseY = currentY;
+        
+        drawImages();
+        e.preventDefault();
+      }
+    });
+    
+    canvas.addEventListener('touchend', function(e) {
+      isDragging = false;
+      e.preventDefault();
+    });
+    
     function drawImages() {
+      const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d');
       
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Draw mug image if loaded
+      // Draw mug image
       if (mugImage.complete && mugImage.src) {
         ctx.drawImage(mugImage, 0, 0, canvas.width, canvas.height);
       }
       
-      // Draw decal with transformations if loaded
+      // Draw decal with transformations
       if (decalImage.complete && decalImage.src) {
         ctx.save();
         
-        // Calculate center position for decal
+        // Calculate decal center position
         const centerX = canvas.width / 2 + currentSettings.x;
         const centerY = canvas.height / 2 + currentSettings.y;
         
@@ -392,12 +581,25 @@
         ctx.rotate(currentSettings.rotation);
         ctx.scale(currentSettings.scale, currentSettings.scale);
         
-        // Use multiply blend mode
-        ctx.globalCompositeOperation = 'multiply';
+        // Apply blend mode based on user selection
+        if (currentSettings.useMultiplyMode) {
+          ctx.globalCompositeOperation = 'multiply';
+        }
         
-        // Draw decal centered
-        const drawWidth = decalImage.width;
-        const drawHeight = decalImage.height;
+        // Draw centered and proportionally scaled decal
+        const aspectRatio = decalImage.width / decalImage.height;
+        let drawWidth, drawHeight;
+        
+        if (aspectRatio > 1) {
+          // Landscape image
+          drawWidth = canvas.width * 0.3;
+          drawHeight = drawWidth / aspectRatio;
+        } else {
+          // Portrait or square image
+          drawHeight = canvas.height * 0.3;
+          drawWidth = drawHeight * aspectRatio;
+        }
+        
         ctx.drawImage(decalImage, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
         
         // Restore context
@@ -406,17 +608,12 @@
       }
     }
     
-    function generateDesign() {
-      drawImages();
-      alert('Design applied successfully!');
-    }
-    
     function downloadImage() {
       const canvas = document.getElementById('canvas');
       const link = document.createElement('a');
       link.download = 'my-custom-mug.jpg';
       
-      // Create a temporary canvas with white background
+      // Create temporary canvas with white background
       const tempCanvas = document.createElement('canvas');
       tempCanvas.width = canvas.width;
       tempCanvas.height = canvas.height;
@@ -426,13 +623,22 @@
       tempCtx.fillStyle = '#FFFFFF';
       tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
       
-      // Draw the original canvas onto the temporary canvas
+      // Draw original canvas onto temporary canvas
       tempCtx.drawImage(canvas, 0, 0);
       
-      // Convert to JPEG with quality
+      // Convert to JPEG format and set quality
       link.href = tempCanvas.toDataURL('image/jpeg', 0.9);
       link.click();
     }
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+      // Just redraw images, no need to recalculate canvas size
+      // Since we now maintain original canvas size and only adjust display ratio
+      if (mugImage.complete && mugImage.src) {
+        drawImages();
+      }
+    });
   </script>
 </body>
 </html>
